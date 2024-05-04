@@ -1,0 +1,44 @@
+DNS:
+  '234183026554131052811470095351958002707':
+    interval: 5
+    query: www.google.com
+    record_type: A
+    server: 8.8.8.8
+HTTP:
+  '234183026316446565267841946315425635347':
+    interval: 5
+    url: http://gaia.cs.umass.edu
+HTTPS:
+  '234183026395674727783991321828000848915':
+    interval: 5
+    timeout: 5
+    url: https://www.google.com
+NTP:
+  '234183026474902890297657525096034655251':
+    interval: 5
+    server: pool.ntp.org
+Ping:
+  '234183026157990240240961588591955336211':
+    host: 52.27.33.250
+    interval: 5
+    sequence_number: 1
+    timeout: 1
+    ttl: 64
+TCP:
+  '234183026633359215326137505112151612435':
+    interval: 5
+    ip_address: 127.0.0.1
+    port: 8000
+Traceroute:
+  '234183026237218402752530803283494755347':
+    host: 52.27.33.250
+    interval: 5
+    max_hops: 50
+    pings_per_hop: 1
+    verbose: true
+UDP:
+  '234183026712587377842227207929664166931':
+    interval: 5
+    ip_address: 127.0.0.1
+    port: 6000
+    timeout: 3
