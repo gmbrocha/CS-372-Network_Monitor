@@ -19,8 +19,7 @@ for i in range(8):
     default_ids.append(str(uuid.uuid1().int))
 
 # these were updated - each 'type' of service (ping, http, etc.) will contain a dictionary of unique ids (default ids)
-# each tied to a specific set of parameters - yes there is a lot of nesting, but it seemed like a decent way to allow
-# for individualized specifications for every service to be run
+# each tied to a specific set of parameters
 services_params = {
     "Ping": {default_ids[0]: {"host": "52.27.33.250", "ttl": 64, "timeout": 1, "sequence_number": 1, "interval": 5}},
     "Traceroute": {default_ids[1]: {"host": "52.27.33.250", "max_hops": 50, "pings_per_hop": 1,
@@ -39,6 +38,9 @@ services = ["Ping", "Traceroute", "HTTP", "HTTPS", "DNS", "NTP", "TCP", "UDP"]
 
 def tcp_client_worker(stop_event: threading.Event, service_type: str, service_id: int,
                       service_params: dict):
+    """TCP client to be started in a thread by main(), receives a stop event object to be set for thread shutdown;
+    receives service_type as monitoring service to request, a unique uuid1 service_id, and the entire service_params
+    dict to reference for service config request to server"""
     # Create socket:
     # as with the server script, create socket with AF_INET (IPv4) and STREAMing TCP
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,17 +50,21 @@ def tcp_client_worker(stop_event: threading.Event, service_type: str, service_id
     serv_address = '127.0.0.1'
     serv_port = 5000
 
-    client_socket.connect((serv_address, serv_port))
     try:
+        # attempt connection to the monitoring server
+        client_socket.connect((serv_address, serv_port))
+
         # Send and Recv data:
         # sendall(): send data to the server
         msg = service_type + " " + str(service_id)
         for key in service_params.keys():
             msg += " " + str(service_params[key])
 
+        # send initial configuration
         client_socket.send(msg.encode())
 
         # recv(): get data from the server, specifying buffer (1024 bytes in this instance)
+        # run thread loop until the stop_event object is .set() by keyboard interrupt
         while not stop_event.is_set():
             try:
                 response = client_socket.recv(1024)
@@ -72,6 +78,7 @@ def tcp_client_worker(stop_event: threading.Event, service_type: str, service_id
 
 
 def stop_thread():
+    """Stop request to server to terminate threads"""
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -462,7 +469,6 @@ def main(active_services, services_parameters):
                             case "return to main":
                                 display_config = False
 
-                # TODO FLESH THIS OUT
                 case "start services":
                     print("Ctrl + c to end monitoring at any time.")
                     print(active_services)
